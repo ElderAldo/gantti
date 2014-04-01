@@ -149,22 +149,19 @@ class Gantti {
       $width  = round($days * $this->options['cellwidth'] - 9);
       $height = round($this->options['cellheight']-8);
       $class  = ($block['class']) ? ' ' . $block['class'] : '';
-      $html[] = '<span class="gantt-block' . $class . '" style="left: ' . $left . 'px; width: ' . $width . 'px; height: ' . $height . 'px"><strong class="gantt-block-label">' . $days . '</strong></span>';
+      $html[] = '<span class="gantt-block' . $class . '" style="left: ' . $left . 'px; width: ' . $width . 'px; height: ' . $height . 'px"><strong class="gantt-block-label">' . $days . '</strong>';
+        //add the milestones for this project
+        foreach ($block['milestones'] as $milestone)
+        {
+          $mleft = round(((strtotime($milestone) - $block['start']) / 60 / 60 / 24) * $this->options['cellwidth']) + round(($this->options['cellwidth'] / 2) - 5);
+          $html[] = '<time style="left:'.$mleft.'px" title="Milestone">Milestone</time>';
+        }
+      $html[] = '</span>';
       $html[] = '</li>';
 
     }
 
     $html[] = '</ul>';
-
-    // Add lines for Milestones!
-    if (!empty($this->options['milestones']))
-    {
-      foreach ($this->options['milestones'] as $milestone_date)
-      {
-        $html[] = $this->addMilestone($milestone_date);
-      }
-    }
-
 
     if($this->options['today']) {
 
@@ -187,29 +184,6 @@ class Gantti {
 
     return implode('', $html);
 
-  }
-
-  /**
-   * adds a milestone as a white line to the chart.
-   *
-   * @author 	rfiala <roland.fiala@googlemail.com>
-   * @since		2013-01-09
-   *
-   * @param		date	$milestone_date
-   *
-   * @todo		add milestone_label for hover effect.
-   */
-  function addMilestone($milestone_date)
-  {
-  	// get the first day in the gantt chart.
-  	$gantt_start = $this->days[0]->yearINT . "-" . $this->days[0]->monthINT . "-" . $this->days[0]->dayINT;
-
-  	// How much days are between the start date and the milestone date?
-  	$offset = (strtotime($milestone_date) - strtotime($gantt_start)) / 60 / 60 / 24;
-
-  	$today  = $this->cal->today();
-  	$left   = round($offset * $this->options['cellwidth']) + round(($this->options['cellwidth'] / 2) - 1);
-  	return '<time style="top: ' . ($this->options['cellheight'] * 2) . 'px; left: ' . $left . 'px" datetime="' . $today->format('Y-m-d') . '">Milestone</time>';
   }
 
   function __toString() {
